@@ -2,9 +2,10 @@ imports:
     - { resource: "@SyliusCoreBundle/Resources/config/app/config.yml" }
 
     - { resource: "@SyliusAdminBundle/Resources/config/app/config.yml" }
-    - { resource: "@SyliusAdminApiBundle/Resources/config/app/config.yml" }
 
     - { resource: "@SyliusShopBundle/Resources/config/app/config.yml" }
+
+    - { resource: "@SyliusApiBundle/Resources/config/app/config.yaml" }
 
     - { resource: "@SyliusCustomerReorderPlugin/Resources/config/services.xml" }
 
@@ -31,3 +32,6 @@ sylius_grid:
     templates:
         action:
             reorder: "@SyliusCustomerReorderPlugin/reorder.html.twig"
+
+sylius_api:
+    enabled: true

@@ -9,3 +9,12 @@
 !/etc/build/.gitkeep
 
 /tests/Application/yarn.lock
+
+/.phpunit.result.cache
+/behat.yml
+/phpspec.yml
+/phpunit.xml
+
+# Symfony CLI https://symfony.com/doc/current/setup/symfony_server.html#different-php-settings-per-project
+/.php-version
+/php.ini
