@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Sylius\CustomerReorderPlugin\ReorderEligibility;
 
+use Laminas\Stdlib\PriorityQueue;
 use Sylius\Component\Core\Model\OrderInterface;
-use Zend\Stdlib\PriorityQueue;
 
 final class CompositeReorderEligibilityChecker implements ReorderEligibilityChecker
 {
