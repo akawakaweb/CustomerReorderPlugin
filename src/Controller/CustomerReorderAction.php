@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sylius\CustomerReorderPlugin\Controller;
 
-use Nette\InvalidStateException;
 use Sylius\Bundle\CoreBundle\Storage\CartSessionStorage;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
@@ -81,7 +80,7 @@ final class CustomerReorderAction
 
         try {
             $reorder = $this->reorderer->reorder($order, $channel, $customer);
-        } catch (InvalidStateException $exception) {
+        } catch (\InvalidArgumentException $exception) {
             $this->session->getFlashBag()->add('info', $exception->getMessage());
 
             return new RedirectResponse($this->urlGenerator->generate('sylius_shop_account_order_index'));

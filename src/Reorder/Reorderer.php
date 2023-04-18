@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Sylius\CustomerReorderPlugin\Reorder;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Nette\InvalidStateException;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\CustomerInterface;
 use Sylius\Component\Core\Model\OrderInterface;
@@ -57,14 +56,14 @@ final class Reorderer implements ReordererInterface
         CustomerInterface $customer
     ): OrderInterface {
         if (!$this->orderCustomerRelationCheckerInterface->wasOrderPlacedByCustomer($order, $customer)) {
-            throw new InvalidStateException("The customer is not the order's owner.");
+            throw new \InvalidArgumentException("The customer is not the order's owner.");
         }
 
         $reorder = $this->orderFactory->createFromExistingOrder($order, $channel);
         assert($reorder instanceof OrderInterface);
 
         if (empty($reorder->getItems()->getValues())) {
-            throw new InvalidStateException('sylius.reorder.none_of_items_is_available');
+            throw new \InvalidArgumentException('sylius.reorder.none_of_items_is_available');
         }
 
         $reorderEligibilityChecks = $this->reorderEligibilityChecker->check($order, $reorder);

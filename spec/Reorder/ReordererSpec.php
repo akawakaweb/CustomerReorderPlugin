@@ -6,7 +6,6 @@ namespace spec\Sylius\CustomerReorderPlugin\Reorder;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Nette\InvalidStateException;
 use PhpSpec\ObjectBehavior;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\CustomerInterface;
@@ -292,7 +291,7 @@ final class ReordererSpec extends ObjectBehavior
         $orderCustomerRelationChecker->wasOrderPlacedByCustomer($order, $secondCustomer)->shouldBeCalled();
 
         $this
-            ->shouldThrow(InvalidStateException::class)
+            ->shouldThrow(\InvalidArgumentException::class)
             ->during('reorder', [$order, $channel, $secondCustomer])
         ;
     }
