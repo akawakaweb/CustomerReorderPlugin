@@ -22,14 +22,13 @@ use Webmozart\Assert\Assert;
 final class ReorderContext implements Context
 {
     public function __construct(
-        private Session $session,
         private ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter,
         private SelectShippingPageInterface $selectShippingPage,
         private SelectPaymentPageInterface $selectPaymentPage,
         private AddressPageInterface $addressPage,
         private SummaryPageInterface $summaryPage,
         private IndexPageInterface $orderIndexPage,
-        private ProductVariantResolverInterface $productVariantResolver,
+        private ProductVariantResolverInterface $defaultVariantResolver,
         private EntityManagerInterface $objectManager
     ) {
     }

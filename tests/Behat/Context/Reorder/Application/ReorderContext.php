@@ -13,23 +13,11 @@ use Sylius\CustomerReorderPlugin\Reorder\ReordererInterface;
 
 final class ReorderContext implements Context
 {
-    /** @var OrderRepositoryInterface */
-    private $orderRepository;
-
-    /** @var CustomerRepositoryInterface */
-    private $customerRepository;
-
-    /** @var ReordererInterface */
-    private $reorderer;
-
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        CustomerRepositoryInterface $customerRepository,
-        ReordererInterface $reorderer
+        private OrderRepositoryInterface $orderRepository,
+        private CustomerRepositoryInterface $customerRepository,
+        private ReordererInterface $reorderer
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->customerRepository = $customerRepository;
-        $this->reorderer = $reorderer;
     }
 
     /**
