@@ -26,7 +26,7 @@ backend:
 
 frontend:
 	$(RUN_NODE) `(cd tests/Application && yarn install --pure-lockfile)`
-	$(RUN_NODE) `(cd tests/Application && GULP_ENV=prod yarn build)`
+	$(RUN_NODE) `(cd tests/Application && yarn build)`
 
 behat:
 	$(EXEC_PHP) vendor/bin/behat --colors --strict --no-interaction -vvv -f progress

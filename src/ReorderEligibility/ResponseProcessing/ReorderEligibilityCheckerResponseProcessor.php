@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sylius\CustomerReorderPlugin\ReorderEligibility\ResponseProcessing;
 
 use Sylius\CustomerReorderPlugin\ReorderEligibility\ReorderEligibilityCheckerResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 final class ReorderEligibilityCheckerResponseProcessor implements ReorderEligibilityCheckerResponseProcessorInterface
@@ -12,9 +13,9 @@ final class ReorderEligibilityCheckerResponseProcessor implements ReorderEligibi
     /** @var Session */
     private $session;
 
-    public function __construct(Session $session)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->session = $session;
+        $this->session = $requestStack->getSession();
     }
 
     public function process(array $responses): void

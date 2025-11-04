@@ -15,6 +15,7 @@ use Sylius\Component\Order\Context\CartContextInterface;
 use Sylius\CustomerReorderPlugin\Reorder\ReordererInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -53,7 +54,7 @@ final class CustomerReorderAction
         OrderRepositoryInterface $orderRepository,
         ReordererInterface $reorderService,
         UrlGeneratorInterface $urlGenerator,
-        Session $session
+        RequestStack $requestStack,
     ) {
         $this->cartSessionStorage = $cartSessionStorage;
         $this->channelContext = $channelContext;
@@ -62,7 +63,7 @@ final class CustomerReorderAction
         $this->orderRepository = $orderRepository;
         $this->reorderer = $reorderService;
         $this->urlGenerator = $urlGenerator;
-        $this->session = $session;
+        $this->session = $requestStack->getSession();
     }
 
     public function __invoke(Request $request): Response
