@@ -1,31 +1,29 @@
 services:
-  app:
-    image: sylius/standard:1.11-traditional-alpine
+  php:
+    image: ghcr.io/sylius/sylius-php:8.2-fixuid-alpine
+    user: ${DOCKER_USER:-1000:1000}
     environment:
-      APP_ENV: "dev"
+      APP_ENV: ${ENV:-dev}
       DATABASE_URL: "mysql://root:mysql@mysql/sylius_%kernel.environment%?charset=utf8mb4"
       #            DATABASE_URL: "pgsql://root:postgres@postgres/sylius_%kernel.environment%?charset=utf8" # When using postgres
       PHP_DATE_TIMEZONE: "Europe/Warsaw"
     volumes:
-      - ./:/app:delegated
-      - ./.docker/php/php.ini:/etc/php8/php.ini:delegated
-      - ./.docker/nginx/nginx.conf:/etc/nginx/nginx.conf:delegated
-    ports:
-      - 80:80
+      - .:/srv/sylius:rw,cached
+      - public-media:/srv/sylius/public/media:rw
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - mysql
-    networks:
-      - sylius
 
   mysql:
     image: mysql:8.0
     platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: mysql
+    volumes:
+      - mysql-data:/var/lib/mysql:rw
     ports:
       - ${MYSQL_PORT:-3306}:3306
-    networks:
-      - sylius
 
 #    postgres:
 #        image: postgres:14-alpine
@@ -36,7 +34,32 @@ services:
 #            - ${POSTGRES_PORT:-5432}:5432
 #        networks:
 #            - sylius
+  nodejs:
+    image: node:${NODE_VERSION:-20}-alpine
+    user: ${DOCKER_USER:-1000:1000}
+    working_dir: /srv/sylius
+    entrypoint: [ "/bin/sh","-c" ]
+    command:
+      - |
+          cd tests/Application
+          yarn install --pure-lockfile
+          GULP_ENV=prod yarn build
+    volumes:
+      - .:/srv/sylius:rw,cached
 
-networks:
-  sylius:
-    driver: bridge
+  nginx:
+    image: ghcr.io/sylius/sylius-nginx:latest
+    environment:
+        WORKING_DIR: /srv/sylius/tests/Application
+    volumes:
+      - .:/srv/sylius:ro
+      # if you develop on Linux, you may use a bind-mounted host directory instead
+      # - ./public/media:/srv/sylius/public/media:ro
+    depends_on:
+      - php
+    ports:
+      - "80:80"
+
+volumes:
+    mysql-data:
+    public-media:

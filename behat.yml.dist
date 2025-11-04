@@ -47,6 +47,7 @@ default:
             bootstrap: tests/Application/config/bootstrap.php
             kernel:
                 class: Tests\Sylius\CustomerReorderPlugin\Application\Kernel
+                environment: test
 
         FriendsOfBehat\VariadicExtension: ~
 

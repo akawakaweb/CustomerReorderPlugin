@@ -93,9 +93,7 @@ To be able to set up a plugin's database, remember to configure you database cre
 
 ### Docker
 
-1. Execute `docker compose up -d`
-
-2. Initialize plugin `docker compose exec app make init`
+1. Initialize plugin `make init`
 
 3. See your browser `open localhost`
 
