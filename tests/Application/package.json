@@ -1,7 +1,5 @@
 {
-  "devDependencies": {
-    "@sylius-ui/frontend": "^1.0"
-  },
+  "license": "UNLICENSED",
   "scripts": {
     "build": "encore dev",
     "build:prod": "encore production",
@@ -9,10 +7,7 @@
     "lint": "yarn lint:js",
     "watch": "encore dev --watch"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Sylius/Sylius.git"
-  },
-  "author": "Paweł Jędrzejewski",
-  "license": "MIT"
+  "devDependencies": {
+    "@sylius-ui/frontend": "^1.0.3"
+  }
 }
