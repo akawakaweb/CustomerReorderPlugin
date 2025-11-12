@@ -11,59 +11,27 @@ use Sylius\Component\Core\Model\CustomerInterface;
 use Sylius\Component\Core\Model\OrderInterface;
 use Sylius\Component\Core\Repository\OrderRepositoryInterface;
 use Sylius\Component\Customer\Context\CustomerContextInterface;
-use Sylius\Component\Order\Context\CartContextInterface;
 use Sylius\CustomerReorderPlugin\Reorder\ReordererInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Webmozart\Assert\Assert;
 
 final class CustomerReorderAction
 {
-    /** @var CartSessionStorage */
-    private $cartSessionStorage;
-
-    /** @var ChannelContextInterface */
-    private $channelContext;
-
-    /** @var CartContextInterface */
-    private $cartContext;
-
-    /** @var CustomerContextInterface */
-    private $customerContext;
-
-    /** @var OrderRepositoryInterface */
-    private $orderRepository;
-
-    /** @var ReordererInterface */
-    private $reorderer;
-
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var Session */
-    private $session;
-
+    /**
+     * @param OrderRepositoryInterface<OrderInterface> $orderRepository
+     */
     public function __construct(
-        CartSessionStorage $cartSessionStorage,
-        ChannelContextInterface $channelContext,
-        CartContextInterface $cartContext,
-        CustomerContextInterface $customerContext,
-        OrderRepositoryInterface $orderRepository,
-        ReordererInterface $reorderService,
-        UrlGeneratorInterface $urlGenerator,
-        RequestStack $requestStack,
+        private readonly CartSessionStorage $cartSessionStorage,
+        private readonly ChannelContextInterface $channelContext,
+        private readonly CustomerContextInterface $customerContext,
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly ReordererInterface $reorderer,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
-        $this->cartSessionStorage = $cartSessionStorage;
-        $this->channelContext = $channelContext;
-        $this->cartContext = $cartContext;
-        $this->customerContext = $customerContext;
-        $this->orderRepository = $orderRepository;
-        $this->reorderer = $reorderService;
-        $this->urlGenerator = $urlGenerator;
-        $this->session = $requestStack->getSession();
     }
 
     public function __invoke(Request $request): Response
@@ -72,7 +40,7 @@ final class CustomerReorderAction
         $order = $this->orderRepository->find($request->attributes->get('id'));
 
         $channel = $this->channelContext->getChannel();
-        assert($channel instanceof ChannelInterface);
+        Assert::isInstanceOf($channel, ChannelInterface::class);
 
         /** @var CustomerInterface $customer */
         $customer = $this->customerContext->getCustomer();
@@ -82,12 +50,13 @@ final class CustomerReorderAction
         try {
             $reorder = $this->reorderer->reorder($order, $channel, $customer);
         } catch (\InvalidArgumentException $exception) {
-            $this->session->getFlashBag()->add('info', $exception->getMessage());
+            $session = $request->getSession();
+            Assert::isInstanceOf($session, Session::class);
+
+            $session->getFlashBag()->add('info', $exception->getMessage());
 
             return new RedirectResponse($this->urlGenerator->generate('sylius_shop_account_order_index'));
         }
-
-        assert($reorder instanceof OrderInterface);
 
         $this->cartSessionStorage->setForChannel($channel, $reorder);
 

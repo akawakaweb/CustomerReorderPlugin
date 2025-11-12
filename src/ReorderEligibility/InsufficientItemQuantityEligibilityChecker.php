@@ -10,18 +10,17 @@ use Sylius\CustomerReorderPlugin\ReorderEligibility\ResponseProcessing\Eligibili
 
 final class InsufficientItemQuantityEligibilityChecker implements ReorderEligibilityChecker
 {
-    /** @var ReorderEligibilityConstraintMessageFormatterInterface */
-    private $reorderEligibilityConstraintMessageFormatter;
-
     public function __construct(
-        ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter
+        private readonly ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter,
     ) {
-        $this->reorderEligibilityConstraintMessageFormatter = $reorderEligibilityConstraintMessageFormatter;
     }
 
+    /** @return array<ReorderEligibilityCheckerResponse> */
     public function check(OrderInterface $order, OrderInterface $reorder): array
     {
+        /** @var array<string, int> $orderProductNamesToQuantity */
         $orderProductNamesToQuantity = [];
+        /** @var array<string, int> $reorderProductNamesToQuantity */
         $reorderProductNamesToQuantity = [];
 
         /** @var OrderItemInterface $item */
@@ -34,20 +33,20 @@ final class InsufficientItemQuantityEligibilityChecker implements ReorderEligibi
             $reorderProductNamesToQuantity[$item->getProductName()] = $item->getQuantity();
         }
 
+        /** @var array<string> $insufficientItems */
         $insufficientItems = [];
 
-        /** @var OrderItemInterface $item */
         foreach (array_keys($orderProductNamesToQuantity) as $productName) {
             if (!array_key_exists($productName, $reorderProductNamesToQuantity)) {
                 continue;
             }
 
             if ($orderProductNamesToQuantity[$productName] > $reorderProductNamesToQuantity[$productName]) {
-                array_push($insufficientItems, $productName);
+                $insufficientItems[] = $productName;
             }
         }
 
-        if (empty($insufficientItems)) {
+        if ([] === $insufficientItems) {
             return [];
         }
 

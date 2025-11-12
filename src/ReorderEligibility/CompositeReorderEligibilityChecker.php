@@ -9,8 +9,8 @@ use Sylius\Component\Core\Model\OrderInterface;
 
 final class CompositeReorderEligibilityChecker implements ReorderEligibilityChecker
 {
-    /** @var PriorityQueue|ReorderEligibilityChecker[] */
-    private $eligibilityCheckers;
+    /** @var PriorityQueue<ReorderEligibilityChecker, int> */
+    private readonly PriorityQueue $eligibilityCheckers;
 
     public function __construct()
     {
@@ -22,16 +22,16 @@ final class CompositeReorderEligibilityChecker implements ReorderEligibilityChec
         $this->eligibilityCheckers->insert($eligibilityChecker, $priority);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @return array<ReorderEligibilityCheckerResponse> */
     public function check(OrderInterface $order, OrderInterface $reorder): array
     {
+        /** @var array<ReorderEligibilityCheckerResponse> $eligibilityCheckersFailures */
         $eligibilityCheckersFailures = [];
 
         foreach ($this->eligibilityCheckers as $eligibilityChecker) {
             $eligibilityCheckersFailures = array_merge(
-                $eligibilityCheckersFailures, $eligibilityChecker->check($order, $reorder)
+                $eligibilityCheckersFailures,
+                $eligibilityChecker->check($order, $reorder),
             );
         }
 

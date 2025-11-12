@@ -12,22 +12,16 @@ use Sylius\CustomerReorderPlugin\ReorderEligibility\ResponseProcessing\Eligibili
 
 final class ItemsOutOfStockEligibilityChecker implements ReorderEligibilityChecker
 {
-    /** @var ReorderEligibilityConstraintMessageFormatterInterface */
-    private $reorderEligibilityConstraintMessageFormatter;
-
-    /** @var AvailabilityCheckerInterface */
-    private $availabilityChecker;
-
     public function __construct(
-        ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter,
-        AvailabilityCheckerInterface $availabilityChecker
+        private readonly ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter,
+        private readonly AvailabilityCheckerInterface $availabilityChecker,
     ) {
-        $this->reorderEligibilityConstraintMessageFormatter = $reorderEligibilityConstraintMessageFormatter;
-        $this->availabilityChecker = $availabilityChecker;
     }
 
+    /** @return array<ReorderEligibilityCheckerResponse> */
     public function check(OrderInterface $order, OrderInterface $reorder): array
     {
+        /** @var array<string> $productsOutOfStock */
         $productsOutOfStock = [];
 
         /** @var OrderItemInterface $orderItem */
@@ -39,11 +33,14 @@ final class ItemsOutOfStockEligibilityChecker implements ReorderEligibilityCheck
             /** @var ProductVariantInterface $productVariant */
             $productVariant = $orderItem->getVariant();
             if (!$this->availabilityChecker->isStockAvailable($productVariant)) {
-                $productsOutOfStock[] = $orderItem->getProductName();
+                $productName = $orderItem->getProductName();
+                if (null !== $productName) {
+                    $productsOutOfStock[] = $productName;
+                }
             }
         }
 
-        if (empty($productsOutOfStock)) {
+        if ([] === $productsOutOfStock) {
             return [];
         }
 

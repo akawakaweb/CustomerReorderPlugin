@@ -23,7 +23,7 @@ final class SummaryPage extends BaseSummaryPage implements SummaryPageInterface
     {
         $notifications = $this->getSession()->getPage()->findAll('css', '.sylius-flash-message');
 
-        if (null === $notifications) {
+        if ([] === $notifications) {
             return false;
         }
 
@@ -31,7 +31,7 @@ final class SummaryPage extends BaseSummaryPage implements SummaryPageInterface
         foreach ($notifications as $notification) {
             $message = $notification->getText();
 
-            if (strpos($message, $text)) {
+            if (str_contains($message, $text)) {
                 return true;
             }
         }

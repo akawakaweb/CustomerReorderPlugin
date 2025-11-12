@@ -13,28 +13,12 @@ use Sylius\Component\Resource\Factory\FactoryInterface;
 
 final class ReorderItemsProcessor implements ReorderProcessor
 {
-    /** @var OrderItemQuantityModifierInterface */
-    private $orderItemQuantityModifier;
-
-    /** @var OrderModifierInterface */
-    private $orderModifier;
-
-    /** @var AvailabilityCheckerInterface */
-    private $availabilityChecker;
-
-    /** @var FactoryInterface */
-    private $orderItemFactory;
-
     public function __construct(
-        OrderItemQuantityModifierInterface $orderItemQuantityModifier,
-        OrderModifierInterface $orderModifier,
-        AvailabilityCheckerInterface $availabilityChecker,
-        FactoryInterface $orderItemFactory
+        private readonly OrderItemQuantityModifierInterface $orderItemQuantityModifier,
+        private readonly OrderModifierInterface $orderModifier,
+        private readonly AvailabilityCheckerInterface $availabilityChecker,
+        private readonly FactoryInterface $orderItemFactory,
     ) {
-        $this->orderItemQuantityModifier = $orderItemQuantityModifier;
-        $this->orderModifier = $orderModifier;
-        $this->availabilityChecker = $availabilityChecker;
-        $this->orderItemFactory = $orderItemFactory;
     }
 
     public function process(OrderInterface $order, OrderInterface $reorder): void
@@ -43,16 +27,19 @@ final class ReorderItemsProcessor implements ReorderProcessor
 
         /** @var OrderItemInterface $orderItem */
         foreach ($orderItems as $orderItem) {
-            if (null === $orderItem->getVariant() ||
-                !$this->availabilityChecker->isStockAvailable($orderItem->getVariant())
-            ) {
+            if (null === $orderItem->getVariant()) {
                 continue;
             }
-
+            if (!$this->availabilityChecker->isStockAvailable($orderItem->getVariant())) {
+                continue;
+            }
             $reorderItemQuantity = 0;
 
             if (!$this->availabilityChecker->isStockSufficient($orderItem->getVariant(), $orderItem->getQuantity())) {
-                $reorderItemQuantity = $orderItem->getVariant()->getOnHand() - $orderItem->getVariant()->getOnHold();
+                $variant = $orderItem->getVariant();
+                $onHand = $variant->getOnHand() ?? 0;
+                $onHold = $variant->getOnHold() ?? 0;
+                $reorderItemQuantity = $onHand - $onHold;
             } else {
                 $reorderItemQuantity = $orderItem->getQuantity();
             }

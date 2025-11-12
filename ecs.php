@@ -2,19 +2,25 @@
 
 declare(strict_types=1);
 
-use PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer;
+use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return static function (ECSConfig $ecsConfig): void {
-    $ecsConfig->paths([
+return ECSConfig::configure()
+    ->withPaths([
         __DIR__ . '/src',
         __DIR__ . '/tests/Behat',
         __DIR__ . '/ecs.php',
-    ]);
-
-    $ecsConfig->import('vendor/sylius-labs/coding-standard/ecs.php');
-
-    $ecsConfig->skip([
-        VisibilityRequiredFixer::class => ['*Spec.php'],
-    ]);
-};
+    ])
+    ->withPreparedSets(
+        psr12: true
+    )
+    ->withPhpCsFixerSets(
+        symfony: true,
+        php84Migration: true,
+        phpCsFixer: true,
+        psr12: true,
+    )
+    ->withConfiguredRule(ArraySyntaxFixer::class, [
+        'syntax' => 'short',
+    ])
+;

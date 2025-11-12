@@ -13,10 +13,14 @@ use Sylius\CustomerReorderPlugin\Reorder\ReordererInterface;
 
 final class ReorderContext implements Context
 {
+    /**
+     * @param OrderRepositoryInterface<OrderInterface>       $orderRepository
+     * @param CustomerRepositoryInterface<CustomerInterface> $customerRepository
+     */
     public function __construct(
-        private OrderRepositoryInterface $orderRepository,
-        private CustomerRepositoryInterface $customerRepository,
-        private ReordererInterface $reorderer
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly CustomerRepositoryInterface $customerRepository,
+        private readonly ReordererInterface $reorderer,
     ) {
     }
 
@@ -31,13 +35,18 @@ final class ReorderContext implements Context
         /** @var CustomerInterface $customer */
         $customer = $this->customerRepository->findOneBy(['email' => $customerEmail]);
 
+        $channel = $order->getChannel();
+        if (null === $channel) {
+            throw new \Exception('Order has no channel');
+        }
+
         try {
-            $this->reorderer->reorder($order, $order->getChannel(), $customer);
-        } catch (\InvalidArgumentException $exception) {
+            $this->reorderer->reorder($order, $channel, $customer);
+        } catch (\InvalidArgumentException) {
             return;
         }
 
-        throw new \Exception("Reorder should fail");
+        throw new \Exception('Reorder should fail');
     }
 
     /**

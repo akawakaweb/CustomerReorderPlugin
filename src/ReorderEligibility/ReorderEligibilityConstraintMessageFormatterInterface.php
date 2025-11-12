@@ -6,5 +6,6 @@ namespace Sylius\CustomerReorderPlugin\ReorderEligibility;
 
 interface ReorderEligibilityConstraintMessageFormatterInterface
 {
+    /** @param array<string> $messageParameters */
     public function format(array $messageParameters): string;
 }

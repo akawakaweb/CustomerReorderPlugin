@@ -10,18 +10,17 @@ use Sylius\CustomerReorderPlugin\ReorderEligibility\ResponseProcessing\Eligibili
 
 final class ReorderItemPricesEligibilityChecker implements ReorderEligibilityChecker
 {
-    /** @var ReorderEligibilityConstraintMessageFormatterInterface */
-    private $reorderEligibilityConstraintMessageFormatter;
-
     public function __construct(
-        ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter
+        private readonly ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter,
     ) {
-        $this->reorderEligibilityConstraintMessageFormatter = $reorderEligibilityConstraintMessageFormatter;
     }
 
+    /** @return array<ReorderEligibilityCheckerResponse> */
     public function check(OrderInterface $order, OrderInterface $reorder): array
     {
+        /** @var array<string, int> $orderProductNamesToTotal */
         $orderProductNamesToTotal = [];
+        /** @var array<string, int> $reorderProductNamesToTotal */
         $reorderProductNamesToTotal = [];
 
         /** @var OrderItemInterface $orderItem */
@@ -34,6 +33,7 @@ final class ReorderItemPricesEligibilityChecker implements ReorderEligibilityChe
             $reorderProductNamesToTotal[$reorderItem->getProductName()] = $reorderItem->getUnitPrice();
         }
 
+        /** @var array<string> $orderItemsWithChangedPrice */
         $orderItemsWithChangedPrice = [];
 
         foreach (array_keys($orderProductNamesToTotal) as $productName) {
@@ -42,11 +42,11 @@ final class ReorderItemPricesEligibilityChecker implements ReorderEligibilityChe
             }
 
             if ($orderProductNamesToTotal[$productName] !== $reorderProductNamesToTotal[$productName]) {
-                array_push($orderItemsWithChangedPrice, $productName);
+                $orderItemsWithChangedPrice[] = $productName;
             }
         }
 
-        if (empty($orderItemsWithChangedPrice)) {
+        if ([] === $orderItemsWithChangedPrice) {
             return [];
         }
 

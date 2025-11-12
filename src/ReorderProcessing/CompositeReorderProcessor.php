@@ -9,8 +9,8 @@ use Sylius\Component\Core\Model\OrderInterface;
 
 final class CompositeReorderProcessor implements ReorderProcessor
 {
-    /** @var PriorityQueue|ReorderProcessor[] */
-    private $reorderProcessors;
+    /** @var PriorityQueue<ReorderProcessor, int> */
+    private readonly PriorityQueue $reorderProcessors;
 
     public function __construct()
     {

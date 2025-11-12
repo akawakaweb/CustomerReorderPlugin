@@ -10,29 +10,30 @@ use Sylius\CustomerReorderPlugin\ReorderEligibility\ResponseProcessing\Eligibili
 
 final class ReorderPromotionsEligibilityChecker implements ReorderEligibilityChecker
 {
-    /** @var ReorderEligibilityConstraintMessageFormatterInterface */
-    private $reorderEligibilityConstraintMessageFormatter;
-
     public function __construct(
-        ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter
+        private readonly ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter,
     ) {
-        $this->reorderEligibilityConstraintMessageFormatter = $reorderEligibilityConstraintMessageFormatter;
     }
 
+    /** @return array<ReorderEligibilityCheckerResponse> */
     public function check(OrderInterface $order, OrderInterface $reorder): array
     {
-        if (empty($reorder->getItems()->getValues()) ||
-            $order->getPromotions()->getValues() === $reorder->getPromotions()->getValues()
+        if (0 === $reorder->getItems()->count()
+            || $order->getPromotions()->getValues() === $reorder->getPromotions()->getValues()
         ) {
             return [];
         }
 
+        /** @var array<string> $disabledPromotions */
         $disabledPromotions = [];
 
         /** @var PromotionInterface $promotion */
         foreach ($order->getPromotions()->getValues() as $promotion) {
             if (!in_array($promotion, $reorder->getPromotions()->getValues(), true)) {
-                array_push($disabledPromotions, $promotion->getName());
+                $promotionName = $promotion->getName();
+                if (null !== $promotionName) {
+                    $disabledPromotions[] = $promotionName;
+                }
             }
         }
 
