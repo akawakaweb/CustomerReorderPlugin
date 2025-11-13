@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Tests\Sylius\CustomerReorderPlugin\Behat\Context\Reorder\Ui;
 
 use Behat\Behat\Context\Context;
-use Behat\Mink\Session;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Behat\Page\Shop\Checkout\AddressPageInterface;
 use Sylius\Component\Core\Model\ProductInterface;
@@ -22,14 +20,14 @@ use Webmozart\Assert\Assert;
 final class ReorderContext implements Context
 {
     public function __construct(
-        private ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter,
-        private SelectShippingPageInterface $selectShippingPage,
-        private SelectPaymentPageInterface $selectPaymentPage,
-        private AddressPageInterface $addressPage,
-        private SummaryPageInterface $summaryPage,
-        private IndexPageInterface $orderIndexPage,
-        private ProductVariantResolverInterface $defaultVariantResolver,
-        private EntityManagerInterface $objectManager
+        private readonly ReorderEligibilityConstraintMessageFormatterInterface $reorderEligibilityConstraintMessageFormatter,
+        private readonly SelectShippingPageInterface $selectShippingPage,
+        private readonly SelectPaymentPageInterface $selectPaymentPage,
+        private readonly AddressPageInterface $addressPage,
+        private readonly SummaryPageInterface $summaryPage,
+        private readonly IndexPageInterface $orderIndexPage,
+        private readonly ProductVariantResolverInterface $defaultVariantResolver,
+        private readonly EntityManagerInterface $objectManager,
     ) {
     }
 
@@ -68,9 +66,11 @@ final class ReorderContext implements Context
      */
     public function iShouldBeNotifiedThatProductIsOutOfStock(string ...$products): void
     {
-        $this->summaryPage->doesFlashMessageWithTextExists(sprintf(
-            'Following items: %s are out of stock, which have affected order total.',
-            $this->reorderEligibilityConstraintMessageFormatter->format($products))
+        $this->summaryPage->doesFlashMessageWithTextExists(
+            sprintf(
+                'Following items: %s are out of stock, which have affected order total.',
+                $this->reorderEligibilityConstraintMessageFormatter->format($products),
+            ),
         );
     }
 
@@ -79,11 +79,11 @@ final class ReorderContext implements Context
      * @Then I should be notified that products :firstProduct, :secondProduct are not available in expected quantity
      */
     public function iShouldBeNotifiedThatUnitsOfProductWereAddedToCartInsteadOf(
-        string ...$products
+        string ...$products,
     ): void {
         $this->summaryPage->doesFlashMessageWithTextExists(sprintf(
             'Following items: %s are not available in expected quantity, which have affected order total.',
-            $this->reorderEligibilityConstraintMessageFormatter->format($products)
+            $this->reorderEligibilityConstraintMessageFormatter->format($products),
         ));
     }
 
@@ -92,9 +92,11 @@ final class ReorderContext implements Context
      */
     public function iShouldBeNotifiedThatOrderItemsPriceHasChanged(string $orderItemName): void
     {
-        $this->summaryPage->doesFlashMessageWithTextExists(sprintf(
-            'Prices of products: %s have changed, which have affected order total.',
-            $orderItemName)
+        $this->summaryPage->doesFlashMessageWithTextExists(
+            sprintf(
+                'Prices of products: %s have changed, which have affected order total.',
+                $orderItemName,
+            ),
         );
     }
 
@@ -111,9 +113,11 @@ final class ReorderContext implements Context
      */
     public function iShouldBeNotifiedThatPromotionIsNoLongerEnabled(string $promotionName): void
     {
-        $this->summaryPage->doesFlashMessageWithTextExists(sprintf(
-            'Following promotions: %s are no longer enabled, which have affected order total.',
-            $promotionName)
+        $this->summaryPage->doesFlashMessageWithTextExists(
+            sprintf(
+                'Following promotions: %s are no longer enabled, which have affected order total.',
+                $promotionName,
+            ),
         );
     }
 

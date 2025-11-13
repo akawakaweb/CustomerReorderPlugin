@@ -9,5 +9,6 @@ use Sylius\Behat\Page\Shop\Account\Order\IndexPageInterface as BaseIndexPageInte
 interface IndexPageInterface extends BaseIndexPageInterface
 {
     public function clickReorderButtonNextToTheOrder(string $orderNumber): void;
+
     public function isReorderButtonVisibleNextToTheOrder(string $orderNumber): bool;
 }

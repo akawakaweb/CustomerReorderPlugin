@@ -6,14 +6,13 @@ namespace Sylius\CustomerReorderPlugin\ReorderEligibility;
 
 final class ReorderEligibilityConstraintMessageFormatter implements ReorderEligibilityConstraintMessageFormatterInterface
 {
+    /** @param array<string> $messageParameters */
     public function format(array $messageParameters): string
     {
         $message = '';
 
-        if (count($messageParameters) === 1) {
-            $message = array_pop($messageParameters);
-
-            return $message;
+        if (1 === count($messageParameters)) {
+            return array_pop($messageParameters);
         }
 
         $lastMessageParameter = end($messageParameters);

@@ -15,8 +15,7 @@ final class OrderCustomerRelationChecker implements OrderCustomerRelationChecker
         $orderCustomer = $order->getCustomer();
 
         return
-            null !== $orderCustomer &&
-            $orderCustomer->getId() === $customer->getId()
-        ;
+            null !== $orderCustomer
+            && $orderCustomer->getId() === $customer->getId();
     }
 }

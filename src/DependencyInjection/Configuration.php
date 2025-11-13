@@ -9,10 +9,10 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 final class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('sylius_customer_reorder_plugin');
+        $treeBuilder = new TreeBuilder('sylius_customer_reorder_plugin');
+        $treeBuilder->getRootNode();
 
         return $treeBuilder;
     }
